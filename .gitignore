@@ -1,0 +1,8 @@
+# Temporary logs written by the GUI
+*.log
+
+# User-specific settings
+auto-editor-config.json
+
+# Windows shortcut files
+*.lnk

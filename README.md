@@ -14,12 +14,13 @@ A Windows GUI for [auto-editor](https://github.com/wyattblue/auto-editor), a com
 ## Prerequisites
 
 - **Windows 10 or 11**
-- **Python 3.8+** — [download from python.org](https://www.python.org/downloads/)  
-  During installation, check **"Add Python to PATH"**
-- **auto-editor** — install via pip after Python is set up:
-  ```
-  pip install auto-editor
-  ```
+- **auto-editor** — download the binary from the [GitHub Releases page](https://github.com/WyattBlue/auto-editor/releases/latest):
+  1. Download `auto-editor-windows-x86_64.exe` (or `aarch64` if you have an ARM device)
+  2. Rename it to `auto-editor.exe`
+  3. Move it to a folder that is on your PATH (e.g. `C:\Windows\System32` or any folder you add to PATH manually)
+  4. Verify by opening a terminal and running `auto-editor --help`
+
+> **Note:** Python and pip are no longer required. The auto-editor project no longer publishes new versions to pip.
 
 ---
 
@@ -61,7 +62,7 @@ Settings are saved to `auto-editor-config.json` in the same folder as the script
 
 ## Updating auto-editor
 
-The title bar shows your installed version and the latest version available on PyPI. If they differ, the **Update** button becomes active. Click it to run `pip install auto-editor --upgrade` automatically.
+The title bar shows your installed version alongside the latest release from GitHub. If they differ, the **Update** button becomes active. Clicking it downloads the correct Windows binary for your machine directly from GitHub Releases, replaces the existing binary in-place, and refreshes the version shown in the title bar.
 
 ---
 
