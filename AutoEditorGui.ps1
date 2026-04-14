@@ -112,11 +112,11 @@ $updateButton.Add_Click({
     try {
         Log-Message "Updating Auto-Editor to the latest version..."
         $command = "pip install auto-editor --upgrade"
-        $process = Start-Process powershell -ArgumentList "-Command & { $command }" -PassThru -Wait -RedirectStandardError "error.log" -RedirectStandardOutput "output.log"
-        
-        $errorLog = Get-Content "error.log"
-        if ($errorLog) {
-            Show-Error "Update failed with the following error(s):`r`n$errorLog"
+        $updateProcess = Start-Process powershell -ArgumentList "-Command & { $command }" -PassThru -Wait -RedirectStandardError "error.log" -RedirectStandardOutput "output.log"
+
+        if ($updateProcess.ExitCode -ne 0) {
+            $errorLog = Get-Content "error.log" | Where-Object { $_ -notmatch "^\[notice\]" }
+            Show-Error "Update failed with the following error(s):`r`n$($errorLog -join "`r`n")"
         } else {
             Log-Message "Auto-Editor successfully updated to the latest version."
             $updateButton.Text = "Up-to-date"
@@ -281,10 +281,41 @@ $saveButton.Add_Click({
     }
 })
 
+# Create Pin to Start Menu button
+$pinButton = New-Object System.Windows.Forms.Button
+$pinButton.Text = "Pin to Start"
+$pinButton.Location = New-Object System.Drawing.Point(400, 220)
+$pinButton.Size = New-Object System.Drawing.Size(120, 30)
+$pinButton.FlatStyle = "Flat"
+$pinButton.BackColor = [System.Drawing.Color]::FromArgb(0, 120, 215)
+$pinButton.ForeColor = [System.Drawing.Color]::White
+$form.Controls.Add($pinButton)
+
+$pinButton.Add_Click({
+    try {
+        $scriptDir   = $PSScriptRoot
+        $scriptPath  = Join-Path $scriptDir "AutoEditorGui.ps1"
+        $iconPath    = Join-Path $scriptDir "AutoEditorScript.ico"
+        $shortcutPath = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Auto-Editor.lnk"
+
+        $shell    = New-Object -ComObject WScript.Shell
+        $shortcut = $shell.CreateShortcut($shortcutPath)
+        $shortcut.TargetPath       = "powershell.exe"
+        $shortcut.Arguments        = "-ExecutionPolicy Bypass -WindowStyle Hidden -File `"$scriptPath`""
+        $shortcut.WorkingDirectory = $scriptDir
+        $shortcut.IconLocation     = $iconPath
+        $shortcut.Save()
+
+        Log-Message "Shortcut created. Search 'Auto-Editor' in the Start bar."
+    } catch {
+        Show-Error "Failed to create shortcut: $_"
+    }
+})
+
 # Create a label and box for dragging files
 $dropLabel = New-Object System.Windows.Forms.Label
 $dropLabel.Text = "Drag files here:"
-$dropLabel.Location = New-Object System.Drawing.Point(20, 220)
+$dropLabel.Location = New-Object System.Drawing.Point(20, 265)
 $dropLabel.Size = New-Object System.Drawing.Size(120, 20)
 $form.Controls.Add($dropLabel)
 
@@ -292,7 +323,7 @@ $dropBox = New-Object System.Windows.Forms.Panel
 $dropBox.BorderStyle = 'FixedSingle'
 $dropBox.AllowDrop = $true
 $dropBox.Size = New-Object System.Drawing.Size(350, 50)
-$dropBox.Location = New-Object System.Drawing.Point(150, 220)
+$dropBox.Location = New-Object System.Drawing.Point(150, 265)
 $dropBox.BackColor = [System.Drawing.Color]::FromArgb(220, 220, 220)
 $form.Controls.Add($dropBox)
 
@@ -308,8 +339,8 @@ $logBox = New-Object System.Windows.Forms.TextBox
 $logBox.Multiline = $true
 $logBox.ReadOnly = $true
 $logBox.ScrollBars = 'Vertical'
-$logBox.Size = New-Object System.Drawing.Size(500, 200)
-$logBox.Location = New-Object System.Drawing.Point(20, 290)
+$logBox.Size = New-Object System.Drawing.Size(500, 185)
+$logBox.Location = New-Object System.Drawing.Point(20, 335)
 $logBox.Font = New-Object System.Drawing.Font('Consolas', 10)
 $logBox.BackColor = [System.Drawing.Color]::White
 $logBox.BorderStyle = 'FixedSingle'
